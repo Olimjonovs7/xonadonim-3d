@@ -1,0 +1,311 @@
+/* Xonadonim.uz — 3D PropTech Experience Style System */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-deep: #030710;
+  --bg-surface: #081120;
+  --bg-surface-elevated: #0f1c33;
+  --gold-300: #fae49d;
+  --gold-400: #eec866;
+  --gold-500: #d4a034;
+  --gold-600: #a77717;
+  --cyan-400: #38e1ff;
+  --cyan-500: #00aef0;
+  --emerald-400: #34d399;
+  --emerald-500: #10b981;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-gold: rgba(212, 160, 52, 0.35);
+  --glass-bg: rgba(8, 17, 32, 0.72);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  background-color: var(--bg-deep);
+  color: var(--text-main);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 3D WebGL Canvas Layer */
+#webgl-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  outline: none;
+  cursor: grab;
+}
+
+#webgl-canvas:active {
+  cursor: grabbing;
+}
+
+/* UI Overlay Layer */
+#ui-root {
+  position: relative;
+  z-index: 10;
+  pointer-events: none;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Interactive elements within UI root */
+.interactive {
+  pointer-events: auto;
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid var(--border-glass);
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: rgba(15, 28, 51, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  border-color: rgba(212, 160, 52, 0.45);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 32px -10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(212, 160, 52, 0.15);
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #fff7d6 0%, #eec866 45%, #b58320 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.cyan-gradient-text {
+  background: linear-gradient(135deg, #bdf4ff 0%, #00aef0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Floating Dock (Tech Artist style) */
+.floating-dock {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 9999px;
+  background: rgba(6, 14, 28, 0.82);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid rgba(212, 160, 52, 0.28);
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 160, 52, 0.18);
+  pointer-events: auto;
+}
+
+.dock-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: #cbd5e1;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.dock-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dock-btn.active {
+  background: linear-gradient(135deg, var(--gold-400), var(--gold-500));
+  color: #040810;
+  box-shadow: 0 4px 15px rgba(212, 160, 52, 0.4);
+}
+
+.dock-btn svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.dock-btn:hover svg {
+  transform: scale(1.1);
+}
+
+.dock-divider {
+  width: 1px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 0 2px;
+}
+
+/* Sound Button Wave Animation */
+.sound-bar {
+  display: inline-block;
+  width: 3px;
+  height: 12px;
+  background-color: currentColor;
+  border-radius: 2px;
+  animation: soundBars 1.2s infinite ease-in-out alternate;
+}
+.sound-bar:nth-child(2) { animation-delay: 0.2s; height: 16px; }
+.sound-bar:nth-child(3) { animation-delay: 0.4s; height: 8px; }
+
+@keyframes soundBars {
+  0% { transform: scaleY(0.4); }
+  100% { transform: scaleY(1.2); }
+}
+
+.sound-muted .sound-bar {
+  animation: none;
+  height: 4px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gold-500);
+  border-radius: 3px;
+}
+
+/* Live Pulsing Dot */
+.live-pulse {
+  position: relative;
+  display: inline-flex;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--emerald-400);
+}
+.live-pulse::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background-color: var(--emerald-400);
+  opacity: 0.7;
+  animation: pulseAnim 2s infinite;
+}
+@keyframes pulseAnim {
+  0% { transform: scale(0.8); opacity: 0.8; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+/* 3D Apartment Floor Marker Pins */
+.floor-marker {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 30px;
+  background: rgba(6, 14, 28, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--gold-400);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  pointer-events: auto;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+  transform: translate(-50%, -50%);
+  transition: all 0.2s ease;
+  z-index: 25;
+}
+.floor-marker:hover {
+  transform: translate(-50%, -55%) scale(1.08);
+  border-color: #fff;
+  box-shadow: 0 0 25px rgba(212, 160, 52, 0.5);
+}
+
+/* Loading Screen Animation */
+#loader-screen {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, #0a1426 0%, #030710 100%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
+}
+#loader-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loader-logo-ring {
+  width: 72px;
+  height: 72px;
+  border: 2px solid rgba(212, 160, 52, 0.2);
+  border-top-color: var(--gold-400);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Tooltip & Micro Tag */
+.badge-verified {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: var(--emerald-400);
+}
+
+.badge-gold {
+  background: rgba(212, 160, 52, 0.15);
+  border: 1px solid rgba(212, 160, 52, 0.4);
+  color: var(--gold-300);
+}
+
+@media (max-width: 768px) {
+  .floating-dock {
+    bottom: 14px;
+    padding: 4px 6px;
+    gap: 3px;
+    max-width: 96vw;
+    overflow-x: auto;
+  }
+  .dock-btn {
+    padding: 6px 11px;
+    font-size: 11px;
+  }
+}

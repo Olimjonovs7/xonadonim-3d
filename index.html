@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="uz" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xonadonim.uz — 3D Interaktiv PropTech Platformasi</title>
+  
+  <meta name="description" content="O'zbekistonda ilk bor: 3D interaktiv arxitektura, planirovkalar, 100-ballik anti-fake sifat kafolati va Telegram bot ekotizimi." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4a034'%3E%3Cpath d='M12 3L2 11h3v9h6v-6h2v6h6v-9h3L12 3z'/%3E%3C/svg%3E" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              950: '#030710',
+              900: '#081120',
+              800: '#0f1c33',
+            },
+            gold: {
+              300: '#fae49d',
+              400: '#eec866',
+              500: '#d4a034',
+              600: '#a77717',
+            },
+            click: {
+              500: '#00aef0',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Three.js & GSAP CDNs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="selection:bg-gold-500 selection:text-navy-950">
+
+  <!-- Interactive 3D Canvas Background -->
+  <canvas id="webgl-canvas"></canvas>
+
+  <!-- Loading Screen -->
+  <div id="loader-screen">
+    <div class="loader-logo-ring mb-4"></div>
+    <div class="flex items-center gap-2">
+      <span class="font-display font-bold text-lg text-white">Xonad<span class="text-gold-400">o</span>nim</span>
+      <span class="text-xs uppercase tracking-widest text-gold-400/80">3D PropTech</span>
+    </div>
+    <p class="text-xs text-slate-400 mt-2 font-mono">Arxitektura va fazoviy modellar yuklanmoqda...</p>
+  </div>
+
+  <!-- Floating Toast Notification -->
+  <div id="floating-toast" class="fixed top-20 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full glass-panel text-xs font-semibold text-gold-300 border border-gold-500/40 opacity-0 pointer-events-none transition-all duration-300 z-50 shadow-2xl flex items-center gap-2">
+    Xabarnoma
+  </div>
+
+  <!-- UI Overlay Root Layer -->
+  <div id="ui-root">
+
+    <!-- TOP FOMO & EARLY ACCESS BANNER -->
+    <div class="interactive relative z-30 bg-gradient-to-r from-navy-900/90 via-navy-800/90 to-navy-900/90 border-b border-gold-500/25 px-4 py-2 text-xs md:text-sm backdrop-blur-md">
+      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5">
+          <span class="live-pulse"></span>
+          <p class="font-medium text-slate-200">
+            <span class="text-gold-400 font-bold">Ilk 50,000 ta e'lon:</span> Mulkdorlar va rieltorlar uchun <span class="underline decoration-gold-500 font-semibold">100% BEPUL</span> va Tasdiqlangan (Verified) maqomi!
+          </p>
+        </div>
+        <div class="flex items-center gap-4 ml-auto">
+          <div class="hidden sm:flex items-center gap-2 bg-navy-950/80 px-3 py-1 rounded-full border border-white/10">
+            <span class="text-slate-400 text-xs">Progress:</span>
+            <span class="font-display font-bold text-gold-400">560</span>
+            <span class="text-slate-500 text-xs">/ 50,000</span>
+          </div>
+          <a href="https://t.me/XonadonimRobot" target="_blank" class="text-gold-400 hover:text-gold-300 font-bold flex items-center gap-1">
+            E'lon qo'shish <span>→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- STICKY GLASS HEADER -->
+    <header class="interactive sticky top-0 z-30 backdrop-blur-2xl bg-navy-950/70 border-b border-white/10 transition">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+        
+        <!-- Brand Logo -->
+        <a href="#" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-navy-800 to-navy-900 border border-gold-500/40 flex items-center justify-center shadow-lg group-hover:border-gold-400 transition">
+            <svg class="w-6 h-6 text-gold-400" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 3L2 11h3v9h6v-6h2v6h6v-9h3L12 3zm5 2.2V3h-2v.6L17 5.2z"/>
+            </svg>
+          </div>
+          <div>
+            <span class="font-display text-xl font-bold tracking-tight text-white">Xonad<span class="text-gold-400">o</span>nim</span>
+            <span class="block text-[10px] uppercase tracking-widest text-slate-400 -mt-1 font-mono">3D PropTech Ecosystem</span>
+          </div>
+        </a>
+
+        <!-- Sound & Mode Toggle (Tech Artist Style) -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <button id="sound-toggle-btn" onclick="toggleSound()" class="sound-muted flex items-center gap-2 px-3 py-1.5 rounded-full glass-card text-xs font-semibold text-slate-300 hover:text-gold-300 hover:border-gold-500/40 transition">
+            <div class="flex items-end gap-0.5 h-3">
+              <span class="sound-bar"></span>
+              <span class="sound-bar"></span>
+              <span class="sound-bar"></span>
+            </div>
+            <span class="sound-label hidden sm:inline">Ovoz: OFF</span>
+          </button>
+
+          <div class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-click-500/10 border border-click-500/30 text-xs font-bold text-click-500">
+            <span class="w-2 h-2 rounded-full bg-click-500"></span> CLICK Integrated
+          </div>
+
+          <a href="https://t.me/XonadonimRobot" target="_blank" class="px-4 py-2 rounded-xl bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-xs sm:text-sm hover:brightness-110 transition shadow-lg flex items-center gap-1.5">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2v-2zm0-10h2v8h-2V6z"/>
+            </svg>
+            <span>+ E'lon joylash</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN SCROLLABLE CONTENT -->
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 w-full pb-28">
+
+      <!-- SECTION 1: HERO & SMART 3D CONSOLE -->
+      <section class="min-h-[86vh] flex flex-col justify-between pt-8 pb-12">
+        
+        <div class="grid lg:grid-cols-12 gap-8 items-center my-auto">
+          
+          <!-- Left Column: Copy & Search Console -->
+          <div class="lg:col-span-7 space-y-6 interactive">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-card text-xs font-semibold text-gold-400 border border-gold-500/30">
+              <span>✨ O'zbekistonda ilk bor: 3D Interaktiv PropTech & Anti-Fake Tizimi</span>
+            </div>
+
+            <h1 class="font-display text-4xl sm:text-6xl font-bold leading-[1.08] tracking-tight">
+              O'zingizga mos <br />
+              <span class="gold-gradient-text">xonadonni</span> oson va <br />
+              aldovsiz toping.
+            </h1>
+
+            <p class="text-slate-300 text-base sm:text-lg max-w-2xl leading-relaxed">
+              Soxta «primanka» e'lonlar, yashirin narxlar va eskirgan uylardan charchadingizmi? 
+              <strong class="text-white">Xonadonim.uz</strong> — real vaqtda tekshirilgan xonadonlar, aniq 3D planirovkalar va shaffof narxlar ekotizimi.
+            </p>
+
+            <!-- Interactive Smart Search Console -->
+            <div class="glass-panel rounded-2xl p-4 sm:p-6 space-y-4 max-w-2xl">
+              <!-- Purpose Tabs -->
+              <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+                <div class="flex gap-2">
+                  <button onclick="switchSearchTab(this, 'Sotuv')" class="search-tab px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 transition">
+                    🏠 Sotib olish
+                  </button>
+                  <button onclick="switchSearchTab(this, 'Ijara')" class="search-tab px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-slate-300 hover:bg-white/5 transition">
+                    🔑 Ijara (Oylik)
+                  </button>
+                  <button onclick="switchSearchTab(this, 'Talaba')" class="search-tab px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 transition">
+                    🎓 Talabalar uchun (OTM)
+                  </button>
+                </div>
+                <span class="text-xs text-slate-400 hidden sm:inline font-mono">0% yashirin komissiya</span>
+              </div>
+
+              <!-- Filter Inputs -->
+              <div class="grid sm:grid-cols-3 gap-3">
+                <div class="bg-navy-950/70 border border-white/10 rounded-xl px-3.5 py-2.5">
+                  <label class="block text-[11px] text-slate-400 uppercase tracking-wider font-mono">Hudud yoki OTM</label>
+                  <select id="search-district" onchange="flyToDistrict(this.value)" class="w-full bg-transparent text-sm font-semibold text-white focus:outline-none mt-0.5 cursor-pointer">
+                    <option value="all" class="bg-navy-900">Barcha tumanlar (Toshkent)</option>
+                    <option value="yunusobod" class="bg-navy-900">Yunusobod tumani</option>
+                    <option value="mirobod" class="bg-navy-900">Mirobod tumani (Premium)</option>
+                    <option value="chilonzor" class="bg-navy-900">Chilonzor (OTM markazi)</option>
+                    <option value="mirzo" class="bg-navy-900">Mirzo Ulug'bek tumani</option>
+                    <option value="yakkasaroy" class="bg-navy-900">Yakkasaroy tumani</option>
+                  </select>
+                </div>
+
+                <div class="bg-navy-950/70 border border-white/10 rounded-xl px-3.5 py-2.5">
+                  <label class="block text-[11px] text-slate-400 uppercase tracking-wider font-mono">Xonalar va Turi</label>
+                  <select class="w-full bg-transparent text-sm font-semibold text-white focus:outline-none mt-0.5 cursor-pointer">
+                    <option class="bg-navy-900">1–2 xonali kvartira</option>
+                    <option class="bg-navy-900">3+ xonali kvartira</option>
+                    <option class="bg-navy-900">Yangi binolar (Novostroyka)</option>
+                    <option class="bg-navy-900">Hovli / Kottej</option>
+                  </select>
+                </div>
+
+                <div class="flex items-center">
+                  <a href="https://xonadonim.uz/estates" class="w-full h-full min-h-[50px] rounded-xl bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-sm flex items-center justify-center gap-2 hover:brightness-110 transition shadow-lg">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/>
+                    </svg>
+                    <span>Uylarni ko'rish</span>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Quick Tags -->
+              <div class="flex flex-wrap items-center gap-2 pt-1 text-xs">
+                <span class="text-slate-400">Tezkor:</span>
+                <button onclick="set3DView('explode')" class="px-2.5 py-1 rounded-md bg-gold-500/10 hover:bg-gold-500/20 text-gold-400 border border-gold-500/30 transition flex items-center gap-1 font-semibold">
+                  💥 3D Qavatlar kesimi
+                </button>
+                <button onclick="flyToDistrict('chilonzor')" class="px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 text-slate-300 transition">
+                  🎓 Talabalar uchun
+                </button>
+                <button onclick="set3DView('blueprint')" class="px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 text-cyan-400 transition">
+                  📐 3D Rentgen chizma
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Interactive 3D Telemetry HUD Card -->
+          <div class="lg:col-span-5 flex flex-col items-end justify-center interactive">
+            <div id="hud-card" class="glass-panel rounded-2xl p-5 w-full max-w-sm space-y-4 border-l-4 border-l-gold-400">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-gold-400 font-mono">3D Ob'ekt Pasporti (Jonli)</span>
+                <span id="hud-score" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  ★ 98 / 100 Ball
+                </span>
+              </div>
+              
+              <div>
+                <h3 id="hud-title" class="font-display text-lg font-bold text-white">Toshkent Bosh Markaz</h3>
+                <p id="hud-sub" class="text-xs text-slate-400">Sichqonchani harakatlantiring yoki tuman tanlang</p>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2.5 text-xs">
+                <div class="bg-navy-950/80 p-2.5 rounded-xl border border-white/5">
+                  <span class="text-slate-400 block text-[11px]">O'rtacha Sotuv (m²)</span>
+                  <span id="hud-sale" class="font-display text-base font-bold text-white">$1,280 / m²</span>
+                </div>
+                <div class="bg-navy-950/80 p-2.5 rounded-xl border border-white/5">
+                  <span class="text-slate-400 block text-[11px]">O'rtacha Ijara (oylik)</span>
+                  <span id="hud-rent" class="font-display text-base font-bold text-gold-400">$480 / oy</span>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between pt-1 border-t border-white/10 text-xs text-slate-300">
+                <div class="flex items-center gap-1.5 text-emerald-400 font-semibold">
+                  <span>✓</span> 100% Real mulkdor
+                </div>
+                <button onclick="set3DView('explode')" class="text-xs text-gold-400 hover:text-gold-300 font-bold underline">
+                  7-qavatni ochish →
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Live Platform Metrics Counters -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 interactive">
+          <div class="glass-card rounded-xl p-4">
+            <span class="text-xs text-slate-400">Tekshirilgan baza</span>
+            <p class="font-display text-2xl font-bold text-white mt-0.5">560+ <span class="text-xs font-normal text-emerald-400">faol</span></p>
+          </div>
+          <div class="glass-card rounded-xl p-4">
+            <span class="text-xs text-slate-400">Yashirin ustama</span>
+            <p class="font-display text-2xl font-bold text-gold-400 mt-0.5">0% <span class="text-xs font-normal text-slate-300">shaffof</span></p>
+          </div>
+          <div class="glass-card rounded-xl p-4">
+            <span class="text-xs text-slate-400">Telegram Bot orqali</span>
+            <p class="font-display text-2xl font-bold text-white mt-0.5">10 sek <span class="text-xs font-normal text-slate-300">e'lon berish</span></p>
+          </div>
+          <div class="glass-card rounded-xl p-4">
+            <span class="text-xs text-slate-400">Anti-Fake nazorati</span>
+            <p class="font-display text-2xl font-bold text-emerald-400 mt-0.5">24/7 <span class="text-xs font-normal text-slate-300">avtomatik</span></p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- SECTION 2: 100-POINT QUALITY SCORE SIMULATOR (Immobiliare.it) -->
+      <section id="quality-simulator" class="py-20 interactive">
+        <div class="grid lg:grid-cols-12 gap-10 items-center">
+          
+          <div class="lg:col-span-6 space-y-6">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-400 text-xs font-bold font-mono">
+              🏆 Immobiliare.it Standarti O'zbekistonda
+            </div>
+            <h2 class="font-display text-3xl sm:text-5xl font-bold leading-tight">
+              TOPga pul bilan emas, <br />
+              <span class="gold-gradient-text">Sifat Balli</span> bilan chiqing!
+            </h2>
+            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+              Bizda bitta xira rasm qo'yib, «Narxi direktda» deydigan e'lonlar pastda qoladi. 
+              Quyidagi bandlarni belgilab ko'ring: e'loningizni qanchalik to'liq to'ldirsangiz, <strong class="text-white">Sifat Balli (0–100)</strong> shunchalik oshadi va 3D binoda qavatlar yonadi!
+            </p>
+
+            <!-- Checkbox Controls -->
+            <div class="space-y-3" id="score-controls">
+              <label class="flex items-center justify-between p-4 rounded-xl glass-card cursor-pointer">
+                <div class="flex items-center gap-3">
+                  <input type="checkbox" checked onchange="updateQualityScore()" data-points="25" class="w-5 h-5 accent-gold-500 rounded cursor-pointer" />
+                  <div>
+                    <span class="font-bold text-sm text-white block">📸 10+ ta HD Rasm va Aniq Parametrlar</span>
+                    <span class="text-xs text-slate-400">Xonalar, qavat, maydon va sifatli yoritilgan fotolar</span>
+                  </div>
+                </div>
+                <span class="font-display font-bold text-gold-400 text-sm">+25 ball</span>
+              </label>
+
+              <label class="flex items-center justify-between p-4 rounded-xl glass-card cursor-pointer">
+                <div class="flex items-center gap-3">
+                  <input type="checkbox" checked onchange="updateQualityScore()" data-points="25" class="w-5 h-5 accent-gold-500 rounded cursor-pointer" />
+                  <div>
+                    <span class="font-bold text-sm text-white block">📐 Uy Chizmasi (Planirovka) yuklangan</span>
+                    <span class="text-xs text-slate-400">Mijoz bormasdan xonalar o'lchami va joylashuvini ko'radi</span>
+                  </div>
+                </div>
+                <span class="font-display font-bold text-gold-400 text-sm">+25 ball</span>
+              </label>
+
+              <label class="flex items-center justify-between p-4 rounded-xl glass-card cursor-pointer">
+                <div class="flex items-center gap-3">
+                  <input type="checkbox" checked onchange="updateQualityScore()" data-points="25" class="w-5 h-5 accent-gold-500 rounded cursor-pointer" />
+                  <div>
+                    <span class="font-bold text-sm text-white block">📍 Aniq Xarita Pin va Real Bozor Narxi</span>
+                    <span class="text-xs text-slate-400">Yolg'on $50 narx emas, tuman o'rtacha narxiga mos</span>
+                  </div>
+                </div>
+                <span class="font-display font-bold text-gold-400 text-sm">+25 ball</span>
+              </label>
+
+              <label class="flex items-center justify-between p-4 rounded-xl glass-card cursor-pointer">
+                <div class="flex items-center gap-3">
+                  <input type="checkbox" onchange="updateQualityScore()" data-points="25" class="w-5 h-5 accent-gold-500 rounded cursor-pointer" />
+                  <div>
+                    <span class="font-bold text-sm text-white block">🎥 Video-obzor va Shaffof Badjlar (Talaba/Oila)</span>
+                    <span class="text-xs text-slate-400">Qisqa video va komissiya % ochiq ko'rsatilgan</span>
+                  </div>
+                </div>
+                <span class="font-display font-bold text-gold-400 text-sm">+25 ball</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Simulator Live Feedback Panel -->
+          <div class="lg:col-span-6">
+            <div class="glass-panel rounded-3xl p-6 sm:p-8 space-y-6 relative overflow-hidden">
+              <div class="flex items-center justify-between border-b border-white/10 pb-5">
+                <div>
+                  <span class="text-xs uppercase tracking-widest text-slate-400 font-mono">E'lon Sifati Indeksi</span>
+                  <h3 id="score-status-title" class="font-display text-2xl font-bold text-white mt-1">Yuqori Sifatli E'lon</h3>
+                </div>
+                <div class="text-right">
+                  <span id="score-number" class="font-display text-5xl font-extrabold gold-gradient-text">75</span>
+                  <span class="text-slate-400 font-display text-xl">/100</span>
+                </div>
+              </div>
+
+              <!-- Animated Progress Bar -->
+              <div class="w-full h-3 bg-navy-950 rounded-full overflow-hidden p-0.5 border border-white/10">
+                <div id="score-bar" class="h-full rounded-full bg-gradient-to-r from-gold-600 via-gold-400 to-emerald-400 transition-all duration-500" style="width: 75%"></div>
+              </div>
+
+              <!-- Simulated Listing Preview -->
+              <div class="bg-navy-950/90 rounded-2xl p-4 border border-white/10 space-y-3">
+                <div class="flex items-center justify-between text-xs">
+                  <span id="score-badge" class="px-2.5 py-1 rounded-md bg-gold-500/20 text-gold-400 font-bold border border-gold-500/40">
+                    ★ TOP-12 Qidiruvda (1-sahifa)
+                  </span>
+                  <span class="text-emerald-400 font-semibold">🔥 4 ta xaridor tasdiqladi</span>
+                </div>
+                <div class="flex justify-between items-end">
+                  <div>
+                    <h4 class="font-bold text-white text-base">Orikzor Residence — 3 xonali, 88 m²</h4>
+                    <p class="text-xs text-slate-400">Chilonzor tumani • 7/12 qavat • 3D Planirovka bor</p>
+                  </div>
+                  <div class="text-right">
+                    <span class="font-display text-lg font-bold text-gold-400">92 000 USD</span>
+                    <span class="block text-[11px] text-emerald-400">Bozordan 6% arzon</span>
+                  </div>
+                </div>
+              </div>
+
+              <p id="score-hint" class="text-xs text-slate-300 bg-white/5 p-3.5 rounded-xl border border-white/10">
+                💡 <strong>Maslahat:</strong> Video-obzor va shaffof badjlarni yoqsangiz, e'loningiz <strong>100 ball</strong> oladi va «★ Premium Tasdiqlangan» oltin tojiga ega bo'ladi!
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SECTION 3: MAKLER & USER ECOSYSTEM -->
+      <section class="py-16 interactive">
+        <div class="text-center max-w-3xl mx-auto mb-12 space-y-3">
+          <span class="text-xs font-bold uppercase tracking-widest text-gold-400 font-mono">Yagona Ekotizim</span>
+          <h2 class="font-display text-3xl sm:text-5xl font-bold">
+            Maklerlar va Xaridorlar uchun <span class="gold-gradient-text">Kuchli Imkoniyatlar</span>
+          </h2>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="glass-panel rounded-2xl p-6 space-y-4">
+            <div class="w-12 h-12 rounded-xl bg-gold-500/15 border border-gold-500/40 flex items-center justify-center text-2xl">
+              🤖
+            </div>
+            <h3 class="font-display text-xl font-bold text-white">Telegram Web App (@XonadonimRobot)</h3>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Telegramdan chiqmasdan 10 soniyada e'lon joylang, tahrirlang yoki arzon uylar tushishi bilan bir zumda tezkor Push Alert oling.
+            </p>
+            <a href="https://t.me/XonadonimRobot" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-gold-400 hover:underline">
+              Botni sinab ko'rish →
+            </a>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 space-y-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-2xl">
+              🛡️
+            </div>
+            <h3 class="font-display text-xl font-bold text-white">«3 ta Signal» Anti-Fake Himoyasi</h3>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Qo'ng'iroqdan keyingi avtomatik tekshiruv orqali sotilib ketgan yoki yolg'on narxli uylar darhol qidiruvdan tozalanadi. 100% ishonchli ro'yxat.
+            </p>
+            <span class="inline-block text-xs font-bold text-emerald-400">✓ Avtomatik moderatsiya</span>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 space-y-4">
+            <div class="w-12 h-12 rounded-xl bg-click-500/15 border border-click-500/40 flex items-center justify-center text-2xl">
+              ⚡
+            </div>
+            <h3 class="font-display text-xl font-bold text-white">SMM Avto-Post va Click Integratsiya</h3>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Saytga qo'shilgan e'londan Instagram va Telegram uchun tayyor dizaynli post yuklab oling. Click orqali bir zumda TOPga ko'taring.
+            </p>
+            <span class="inline-block text-xs font-bold text-click-500">✓ Rieltorlar vaqtini 5x tejaydi</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FLOATING BOTTOM DOCK (Inspired by iamtechartist / Beanstalk) -->
+    <nav class="floating-dock" aria-label="3D Controls">
+      <button class="dock-btn active" data-view="overview" onclick="set3DView('overview')" title="Shaharga umumiy qarash">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/>
+        </svg>
+        <span>Panorama</span>
+      </button>
+
+      <button class="dock-btn" data-view="apartment" onclick="set3DView('apartment')" title="Kvartiraga yaqinlashish">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span>Kvartira</span>
+      </button>
+
+      <button class="dock-btn" data-view="explode" onclick="set3DView('explode')" title="Qavatlarni ajratib ichki planirovkani ko'rish">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="16 18 22 12 16 6"></polyline>
+          <polyline points="8 6 2 12 8 18"></polyline>
+        </svg>
+        <span>Qavatlar</span>
+      </button>
+
+      <div class="dock-divider"></div>
+
+      <button class="dock-btn" data-view="blueprint" onclick="set3DView('blueprint')" title="3D Rentgen Chizma">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="3" y1="9" x2="21" y2="9"></line>
+          <line x1="9" y1="21" x2="9" y2="9"></line>
+        </svg>
+        <span>Chizma</span>
+      </button>
+
+      <button class="dock-btn" data-view="lighting" onclick="set3DView('lighting')" title="Oqshom / Tungi yoritish">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+        </svg>
+        <span>Yoritish</span>
+      </button>
+    </nav>
+
+    <!-- FOOTER -->
+    <footer class="interactive border-t border-white/10 bg-navy-950/90 backdrop-blur-xl py-10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-gold-500 text-navy-950 font-display font-bold flex items-center justify-center">X</div>
+          <div>
+            <span class="font-display font-bold text-white block">Xonadonim.uz</span>
+            <span class="text-xs text-slate-500">© 2026 Barcha huquqlar himoyalangan</span>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-6 text-xs text-slate-300">
+          <a href="https://xonadonim.uz/estates" class="hover:text-gold-400 transition">Barcha e'lonlar</a>
+          <a href="https://xonadonim.uz/map" class="hover:text-gold-400 transition">Xaritadan qidirish</a>
+          <a href="https://t.me/XonadonimRobot" target="_blank" class="hover:text-gold-400 transition">Telegram Bot</a>
+          <a href="tel:+998971932002" class="text-gold-400 font-bold hover:underline">+998 97 193 20 02</a>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Main 3D Engine Script -->
+  <script src="app.js"></script>
+</body>
+</html>
